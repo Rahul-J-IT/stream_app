@@ -235,6 +235,15 @@ const CreateStreamPage = () => {
           console.log('Disconnected from server');
         });
 
+        // Update event streaming status
+        await axios.post(`http://localhost:5000/api/events/${eventId}/start-streaming`, {}, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        console.log('Stream started and event updated');
+
       } catch (error) {
         console.error('Error starting stream:', error);
       }

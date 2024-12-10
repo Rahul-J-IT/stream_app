@@ -380,6 +380,54 @@ const CreateEventPage = () => {
         }}>
           <h3 style={{ marginBottom: '24px' }}>Event Options</h3>
           
+          {/* Add Event Type Option */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '16px'
+          }}>
+            <div>
+              <h4>Event Type</h4>
+              <span style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                {eventType}
+              </span>
+            </div>
+            <div style={{
+              display: 'flex',
+              gap: '10px'
+            }}>
+              <button
+                type="button"
+                onClick={() => setEventType('Public')}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: eventType === 'Public' ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '20px',
+                  color: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                Public
+              </button>
+              <button
+                type="button"
+                onClick={() => setEventType('Private')}
+                style={{
+                  padding: '8px 16px',
+                  backgroundColor: eventType === 'Private' ? 'rgba(255, 255, 255, 0.2)' : 'transparent',
+                  border: '1px solid rgba(255, 255, 255, 0.2)',
+                  borderRadius: '20px',
+                  color: 'white',
+                  cursor: 'pointer'
+                }}
+              >
+                Private
+              </button>
+            </div>
+          </div>
+
           {/* Tickets Option */}
           <div style={{
             display: 'flex',
