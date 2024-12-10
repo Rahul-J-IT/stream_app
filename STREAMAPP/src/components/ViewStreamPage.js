@@ -78,7 +78,7 @@ const ViewStreamPage = () => {
     const connectToStream = async () => {
       try {
         // First get the stream details
-        const response = await axios.get(`http://localhost:3001/api/streams`);
+        const response = await axios.get(`http://localhost:5000/api/streams`);
         console.log('Available streams:', response.data.streams);
         
         // Find active stream for this event
@@ -155,7 +155,7 @@ const ViewStreamPage = () => {
         };
 
         // Connect to Socket.IO server
-        const socket = io('http://localhost:3001', {
+        const socket = io('http://localhost:5000', {
           transports: ['websocket'],
           reconnection: true,
           reconnectionAttempts: 5,
