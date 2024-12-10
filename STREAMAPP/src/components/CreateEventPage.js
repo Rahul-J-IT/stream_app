@@ -169,7 +169,7 @@ const CreateEventPage = () => {
           required
         />
 
-        <button type="submit">Create Event</button>
+        <button type="submit">Stream Now</button>
       </form>
     </div>
   );

@@ -3,11 +3,14 @@ import React, { useState, useRef, useEffect } from 'react';
 const ChatBox = ({ socket, eventId, isBroadcaster }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const messagesEndRef = useRef(null);
   const username = localStorage.getItem('username') || (isBroadcaster ? 'Broadcaster' : 'Viewer');
 
+  const emojis = ['😀', '😂', '😍', '😢', '😎', '👍', '❤️'];
+
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
   useEffect(() => {
@@ -16,10 +19,8 @@ const ChatBox = ({ socket, eventId, isBroadcaster }) => {
       return;
     }
 
-    // Listen for chat messages
     socket.on('chat-message', (message) => {
-      console.log('Received chat message:', message);
-      setMessages(prevMessages => [...prevMessages, message]);
+      setMessages((prevMessages) => [...prevMessages, message]);
       scrollToBottom();
     });
 
@@ -39,104 +40,194 @@ const ChatBox = ({ socket, eventId, isBroadcaster }) => {
       text: newMessage.trim(),
       username,
       timestamp: new Date().toISOString(),
-      isBroadcaster
+      isBroadcaster,
     };
 
-    console.log('Sending message:', messageData);
     socket.emit('send-message', messageData);
     setNewMessage('');
   };
 
-  return (
-    <div style={{
-      width: '100%',
-      height: '75vh',
-      border: '1px solid #ccc',
-      borderRadius: '8px',
-      display: 'flex',
-      flexDirection: 'column',
-      backgroundColor: '#fff'
-    }}>
-      <div style={{
-        padding: '10px',
-        borderBottom: '1px solid #ccc',
-        backgroundColor: '#f8f9fa'
-      }}>
-        <h3 style={{ margin: 0, fontSize: '1rem',color:'#4444ff' }}>Live Chat</h3>
-      </div>
+  const handleEmojiClick = (emoji) => {
+    setNewMessage((prev) => prev + emoji);
+  };
 
-      <div style={{
-        flex: 1,
-        overflowY: 'auto',
-        padding: '10px',
+  const handleKeyPress = (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      handleSendMessage(e);
+    }
+  };
+
+  return (
+    <div
+      style={{
+        width: '320px',
+        height: '80vh',
+        bottom: '50px',
+        right: '20px',
+        borderRadius: '12px',
+        overflow: 'hidden',
         display: 'flex',
         flexDirection: 'column',
-        gap: '8px'
-      }}>
+        background: '#18181b',
+        border: '1px solid #333',
+        transition: 'all 0.3s ease',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.2)',
+      }}
+    >
+      {/* Header */}
+      <div
+        style={{
+          height: '50px',
+          background: '#1f2937',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <h3 style={{ margin: 0, color: 'white', fontSize: '16px' }}>STREAM CHAT</h3>
+      </div>
+
+      {/* Chat Messages */}
+      <div
+        style={{
+          flex: 1,
+          overflowY: 'auto',
+          padding: '10px',
+          background: '#2d2f33',
+          color: 'white',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '10px',
+        }}
+      >
         {messages.map((msg, index) => (
-          <div key={index} style={{
-            backgroundColor: msg.isBroadcaster ? '#ffebee' : '#f5f5f5',
-            padding: '8px',
-            borderRadius: '8px',
-            maxWidth: '90%',
-            alignSelf: msg.username === username ? 'flex-end' : 'flex-start',
-            wordBreak: 'break-word'
-          }}>
-            <div style={{
-              fontSize: '0.8em',
-              color: msg.isBroadcaster ? '#c62828' : '#666',
-              fontWeight: msg.isBroadcaster ? 'bold' : 'normal',
-              marginBottom: '4px'
-            }}>
-              {msg.username} {msg.isBroadcaster && '(Broadcaster)'}
-            </div>
-            <div>{msg.text}</div>
-            <div style={{
-              fontSize: '0.7em',
-              color: '#999',
-              marginTop: '4px'
-            }}>
-              {new Date(msg.timestamp).toLocaleTimeString()}
+          <div
+            key={index}
+            style={{
+              alignSelf: msg.username === username ? 'flex-end' : 'flex-start',
+              maxWidth: '80%',
+              padding: '8px 12px',
+              borderRadius: '8px',
+              color: 'white',
+              fontSize: '16px',
+              wordWrap: 'break-word',
+              whiteSpace: 'normal',
+              wordBreak: 'break-word',
+              background: 'transparent',
+              border: '1px solid #333',
+            }}
+          >
+            <div style={{ fontSize: '16px', fontWeight: 'bold' }}>
+              {msg.isBroadcaster
+                ? `Broadcaster : ${msg.text}`
+                : `${msg.username}: ${msg.text}`}
             </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
 
-      <form onSubmit={handleSendMessage} style={{
-        padding: '10px',
-        borderTop: '1px solid #ccc',
-        display: 'flex',
-        gap: '8px'
-      }}>
-        <input
-          type="text"
-          value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
-          placeholder="Type a message..."
+      {/* Input Section */}
+      <div
+        style={{
+          padding: '10px',
+          background: '#1f2937',
+          display: 'flex',
+          alignItems: 'center',
+          flexDirection: 'column',
+          gap: '8px',
+        }}
+      >
+        <div
           style={{
-            flex: 1,
-            padding: '8px',
-            borderRadius: '4px',
-            border: '1px solid #ccc'
-          }}
-        />
-        <button
-          type="submit"
-          style={{
-            padding: '8px 16px',
-            backgroundColor: '#4444ff',
-            color: 'white',
-            border: 'none',
-            borderRadius: '4px',
-            cursor: 'pointer'
+            position: 'relative',
+            display: 'flex',
+            gap: '8px',
+            justifyContent: 'center',
+            width: '100%',
           }}
         >
-          Send
+          <input
+            type="text"
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            onKeyDown={handleKeyPress}
+            placeholder="Type a message..."
+            style={{
+              flex: 1,
+              padding: '8px',
+              borderRadius: '8px',
+              border: '1px solid #333',
+              background: '#2d2f33',
+              color: 'white',
+            }}
+          />
+          <button
+            onClick={() => setShowEmojiPicker((prev) => !prev)}
+            style={{
+              background: '#5865f2',
+              color: 'white',
+              border: 'none',
+              borderRadius: '50%',
+              width: '36px',
+              height: '36px',
+              fontSize: '18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer',
+            }}
+          >
+            😀
+          </button>
+          {showEmojiPicker && (
+            <div
+              style={{
+                position: 'absolute',
+                bottom: '50px',
+                left: '10px',
+                background: '#2d2f33',
+                padding: '10px',
+                borderRadius: '8px',
+                display: 'flex',
+                gap: '5px',
+                flexWrap: 'wrap',
+              }}
+            >
+              {emojis.map((emoji) => (
+                <button
+                  key={emoji}
+                  onClick={() => handleEmojiClick(emoji)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    fontSize: '18px',
+                    cursor: 'pointer',
+                  }}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+        <button
+          onClick={handleSendMessage}
+          style={{
+            background: '#5865f2',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            padding: '8px 16px',
+            cursor: 'pointer',
+            width: '100%',
+          }}
+        >
+          Send Message
         </button>
-      </form>
+      </div>
     </div>
   );
 };
 
-export default ChatBox; 
+export default ChatBox;
