@@ -3,13 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import './BrowsePage.css';
 
+// Import Font Awesome icons
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faTrash, faPencilAlt } from '@fortawesome/free-solid-svg-icons';
+
 const BrowsePage = () => {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [category, setCategory] = useState('');
-  const [searchTerm, setSearchTerm] = useState(''); // New state for search term
+  const [searchTerm, setSearchTerm] = useState('');
   const [userName, setUserName] = useState('');
+  const [thumbnails, setThumbnails] = useState({}); // State for event-specific thumbnails
 
   const navigate = useNavigate();
 
@@ -56,12 +61,34 @@ const BrowsePage = () => {
     navigate(`/edit-event/${id}`);
   };
 
+  const formatDateTime = (dateString) => {
+    const options = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    };
+
+    const date = new Date(dateString);
+    return date.toLocaleString('en-GB', options);
+  };
+
   useEffect(() => {
     const loadEvents = async () => {
       setLoading(true);
       try {
         const fetchedEvents = await fetchEvents();
         setEvents(fetchedEvents);
+
+        // Assuming events contain a field `thumbnail` or `eventThumbnail` for image URL
+        const thumbnailData = fetchedEvents.reduce((acc, event) => {
+          acc[event._id] = event.thumbnail || 'https://via.placeholder.com/150';
+          return acc;
+        }, {});
+        setThumbnails(thumbnailData);
+
       } catch (error) {
         setError('Failed to load events.');
       } finally {
@@ -75,7 +102,6 @@ const BrowsePage = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  // Filter events by category and search term
   const filteredEvents = events
     .filter((event) =>
       category ? event.eventType?.toLowerCase() === category.toLowerCase() : true
@@ -91,20 +117,19 @@ const BrowsePage = () => {
     <div>
       <h2>Event Listings</h2>
       <div className="search-box">
-          <input
-            type="text"
-            placeholder="Search events..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
+        <input
+          type="text"
+          placeholder="Search events..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
       <div className="filters">
         <div className="category-buttons">
           <button onClick={() => setCategory('')}>All Events</button>
           <button onClick={() => setCategory('public')}>Public</button>
           <button onClick={() => setCategory('private')}>Private</button>
         </div>
-       
       </div>
       <div className="event-container">
         {filteredEvents.length === 0 ? (
@@ -112,20 +137,35 @@ const BrowsePage = () => {
         ) : (
           filteredEvents.map((event) => (
             <div key={event._id} className="event-card">
-              <h3>{event.eventName}</h3>
-              <p>{event.description}</p>
-              <p>Location: {event.location || 'Online'}</p>
-              <p>Start: {new Date(event.startDate).toLocaleString()} {event.startTime || ''}</p>
-              <p>End: {new Date(event.endDate).toLocaleString()} {event.endTime || ''}</p>
-              <p>Creator: {event.creator?.name || 'Unknown'}</p>
+              <div className="thumbnail">
+                <img
+                  src={thumbnails[event._id] || 'https://via.placeholder.com/150'}
+                  alt={`${event.eventName} thumbnail`}
+                />
+              </div>
+              <h3 style={{marginBottom:"1em"}}>{event.eventName}</h3>
+              <p style={{marginBottom:"2em"}}>{event.description}</p>
+              <p><span>Location: </span>{event.location || 'Online'}</p>
+              <p><span>Start:</span> {formatDateTime(event.startDate)}</p>
+              <p><span>End:</span> {formatDateTime(event.endDate)}</p>
+              <p style={{marginBottom:"2em"}}><span>Creator:</span> {event.creator?.name || 'Unknown'}</p>
               {event.creator?.name === userName ? (
-                <>
-                  <button onClick={() => handleDelete(event._id)}>Delete</button>
-                  <button onClick={() => handleEdit(event._id)}>Edit</button>
-                  <button onClick={() => navigate(`/create-stream/${event._id}`)}>Create Stream</button>
-                </>
+                <div className="button-group">
+                  <button onClick={() => handleDelete(event._id)} className="icon-btn">
+                    <FontAwesomeIcon icon={faTrash} />
+                  </button>
+                  <button onClick={() => handleEdit(event._id)} className="icon-btn">
+                    <FontAwesomeIcon icon={faPencilAlt} />
+                  </button>
+                  <button
+                    onClick={() => navigate(`/create-stream/${event._id}`)}
+                    className="icon-btn"
+                  >
+                    Start Stream
+                  </button>
+                </div>
               ) : (
-                <button 
+                <button
                   onClick={() => navigate(`/view-stream/${event._id}`)}
                   className="view-stream-btn"
                 >

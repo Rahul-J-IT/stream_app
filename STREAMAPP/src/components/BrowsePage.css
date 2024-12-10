@@ -1,143 +1,213 @@
-/* General page layout */
+/* General Styling */
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa; /* Matches CreateEventPage background */
 }
 
 h2 {
-    text-align: center;
-    color: white;
-    margin-top: 20px;
+  text-align: center;
+  margin-top: 20px;
+  font-size: 1.5em;
+  color: #333; /* Darker for better readability */
 }
 
-/* Button styling */
-button {
-    padding: 10px 20px;
-    margin: 5px;
-    border: none;
-    background-color: #007bff;
-    color: white;
-    font-size: 14px;
-    cursor: pointer;
-    border-radius: 5px;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-button:focus {
-    outline: none;
-}
-
-/* Category buttons container */
-.category-buttons {
-    text-align: center;
-    margin: 20px 0;
-}
-
-/* Event listing container */
-.event-container {
-    width: 100%;
-    margin: 20px auto;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px; /* Increased gap for better spacing */
-}
-
-/* Event card styling */
-.event-card {
-    width: 23%;
-    background-color: #fff;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 15px;
-    margin: 10px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Hover effect for event cards */
-.event-card:hover {
-    transform: translateY(-5px);
-}
-
-/* Event title styling */
-.event-card h3 {
-    font-size: 18px;
-    margin: 0 0 10px 0;
-    color: #333;
-    text-align: center;
-}
-
-/* Description styling */
-.event-card p {
-    font-size: 14px;
-    color: #555;
-    margin: 5px 0; /* Adjusted margin for better spacing */
-    text-align: center;
-}
-
-/* Creator name styling */
-.event-card p:last-of-type {
-    font-weight: bold; /* Highlight creator name */
-}
-
-/* Loading and error message styling */
-.loading,
-.error {
-    text-align: center;
-    font-size: 18px;
-    color: #666;
-    margin: 20px 0;
-}
-
-/* Responsive design */
-@media (max-width: 900px) {
-    .event-card {
-        width: calc(50% - 20px); /* Two cards per row for smaller screens */
-    }
-}
-
-@media (max-width: 600px) {
-    .event-card {
-        width: 100%; /* One card per row for mobile */
-    }
-}
-
-.filters {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 20px;
+.search-box {
+  display: flex;
+  justify-content: center;
+  margin: 20px auto;
+  width: 90%;
+  max-width: 600px;
 }
 
 .search-box input {
-    padding: 10px;
-    font-size: 16px;
-    width: 300px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+  padding: 10px;
+  width: 100%;
+  border-radius: 8px; /* Matches the border-radius of CreateEventPage */
+  border: 1px solid #ddd;
+  font-size: 1em;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Adds subtle shadow like CreateEventPage */
 }
 
-.search-box input:focus {
-    outline: none;
-    border-color: #007bff;
+/* Filters Section */
+.filters {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.category-buttons {
+  display: flex;
+  flex-wrap: wrap; /* Ensure buttons wrap properly on smaller screens */
+  gap: 10px;
+  justify-content: center;
+}
+
+.category-buttons button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1em;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.category-buttons button:hover {
+  background-color: #0056b3;
+  transform: translateY(-3px);
+}
+
+/* Event Card Container */
+.event-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin: 0 auto;
+  padding: 20px;
+  max-width: 1200px;
+}
+
+.event-card {
+  background-color: rgba(19, 18, 101, 0.1);
+  border-radius: 10px;
+  border: 1px solid gray;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: transform 0.3s ease-in-out;
+  padding: 15px; /* Added padding to create a gap inside the event card */
+}
+
+.event-card:hover {
+  transform: translateY(-5px);
+}
+
+.thumbnail img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+}
+
+.event-card h3 {
+  font-size: 1.25em;
+  text-align: center;
+  font-family: 'Lato', sans-serif;
+  margin: 10px 0; /* Adjusted margin for better spacing */
+  color: #FF5E00; /* Matches CreateEventPage */
+}
+
+.event-card p {
+  margin: 5px 0; /* Adjusted margin for better spacing */
+  font-family: 'Lato', sans-serif;
+  margin-left:10px;
+  font-size: 1em;
+  color: #ddd; /* Light gray text for better contrast */
+  line-height: 1.5; /* Adjusts the line spacing for better readability */
+}
+
+
+.button-group {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  gap: 10px; /* Added gap between buttons */
+}
+
+.icon-btn {
+  background-color: #ff6347;
+  color: white;
+  border: none;
+  padding: 8px;
+  font-size: 1.2em;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.icon-btn:hover {
+  background-color: #e54b3d;
+  transform: translateY(-3px);
 }
 
 .view-stream-btn {
-    background-color: #4CAF50;
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    margin-top: 10px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 1.1em;
+  border-radius: 5px;
+  cursor: pointer;
+  margin: 10px 0;
+  display: block;
+  width: 80%;
+  margin-left: 30px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .view-stream-btn:hover {
-    background-color: #45a049;
+  background-color: #218838;
+  transform: translateY(-3px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .search-box input {
+      font-size: 1em;
+      padding: 8px;
+  }
+
+  .category-buttons {
+      flex-direction: column;
+      align-items: center;
+  }
+
+  .event-container {
+      grid-template-columns: 1fr; /* Single-column layout for smaller screens */
+      margin: 0 10px;
+  }
+
+  .button-group {
+      flex-direction: column;
+      gap: 10px;
+  }
+
+  .icon-btn {
+      font-size: 1em;
+      padding: 10px;
+  }
+
+  .view-stream-btn {
+      font-size: 1.2em;
+  }
+}
+
+@media (max-width: 480px) {
+  h2 {
+      font-size: 1.3em;
+  }
+
+  .event-card h3 {
+      font-size: 1.1em;
+  }
+
+  .event-card p {
+      font-size: 30px;
+  }
+
+  .event-card {
+      padding: 10px;
+  }
+
+  .view-stream-btn {
+      font-size: 1em;
+  }
+
+  .search-box input {
+      font-size: 1em;
+      padding: 8px;
+  }
 }

@@ -3,11 +3,17 @@ import React, { useState, useRef, useEffect } from 'react';
 const ChatBox = ({ socket, eventId, isBroadcaster }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const [showEmojiSection, setShowEmojiSection] = useState(false);
   const messagesEndRef = useRef(null);
   const username = localStorage.getItem('username') || (isBroadcaster ? 'Broadcaster' : 'Viewer');
 
-  const emojis = ['😀', '😂', '😍', '😢', '😎', '👍', '❤️'];
+  // Grouped Emojis
+  const emojiGroups = {
+    Smileys: ['😀', '😂', '😍', '😢', '😎', '🤔', '😅', '😊', '😇'],
+    Animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🦁'],
+    Food: ['🍎', '🍔', '🍕', '🍩', '🍦', '🍉', '🍇', '🥕', '🌭'],
+    Activities: ['⚽', '🏀', '🏈', '🎾', '🏓', '🎮', '🎸', '🎯', '🎤'],
+  };
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -163,7 +169,7 @@ const ChatBox = ({ socket, eventId, isBroadcaster }) => {
             }}
           />
           <button
-            onClick={() => setShowEmojiPicker((prev) => !prev)}
+            onClick={() => setShowEmojiSection((prev) => !prev)}
             style={{
               background: '#5865f2',
               color: 'white',
@@ -180,36 +186,6 @@ const ChatBox = ({ socket, eventId, isBroadcaster }) => {
           >
             😀
           </button>
-          {showEmojiPicker && (
-            <div
-              style={{
-                position: 'absolute',
-                bottom: '50px',
-                left: '10px',
-                background: '#2d2f33',
-                padding: '10px',
-                borderRadius: '8px',
-                display: 'flex',
-                gap: '5px',
-                flexWrap: 'wrap',
-              }}
-            >
-              {emojis.map((emoji) => (
-                <button
-                  key={emoji}
-                  onClick={() => handleEmojiClick(emoji)}
-                  style={{
-                    background: 'transparent',
-                    border: 'none',
-                    fontSize: '18px',
-                    cursor: 'pointer',
-                  }}
-                >
-                  {emoji}
-                </button>
-              ))}
-            </div>
-          )}
         </div>
         <button
           onClick={handleSendMessage}
@@ -226,6 +202,51 @@ const ChatBox = ({ socket, eventId, isBroadcaster }) => {
           Send Message
         </button>
       </div>
+
+      {/* Emoji Section */}
+      {showEmojiSection && (
+        <div
+          style={{
+            background: '#2d2f33',
+            color: 'white',
+            padding: '10px',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '10px',
+            maxHeight: '200px',
+            overflowY: 'auto',
+          }}
+        >
+          {Object.entries(emojiGroups).map(([category, emojis]) => (
+            <div key={category}>
+              <h4 style={{ margin: 0, fontSize: '14px', color: '#aaa' }}>{category}</h4>
+              <div
+                style={{
+                  display: 'flex',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                  padding: '5px 0',
+                }}
+              >
+                {emojis.map((emoji) => (
+                  <button
+                    key={emoji}
+                    onClick={() => handleEmojiClick(emoji)}
+                    style={{
+                      background: 'transparent',
+                      border: 'none',
+                      fontSize: '18px',
+                      cursor: 'pointer',
+                    }}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

@@ -15,6 +15,7 @@ import ViewStreamPage from './components/ViewStreamPage';
 import './components/App.css';
 
 function App() {
+    
   return (
     <Router>
       <div className="app">
