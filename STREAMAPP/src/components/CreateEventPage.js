@@ -15,6 +15,9 @@ const CreateEventPage = () => {
   const [endDate, setEndDate] = useState('');
   const [endTime, setEndTime] = useState('');
   const [description, setDescription] = useState('');
+  const [eventImage, setEventImage] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [errors, setErrors] = useState({});
 
   // Handlers for form input
   const handleLocationChange = (event) => setLocationType(event.target.value);
@@ -26,9 +29,60 @@ const CreateEventPage = () => {
 
   const handleToggleChange = () => setRequireApproval(!requireApproval);
 
+  // Add image handler
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setEventImage(file);
+      // Create preview URL
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    }
+  };
+
+  // Add validation function
+  const validateForm = () => {
+    const newErrors = {};
+    
+    if (!eventName.trim()) {
+      newErrors.eventName = 'Event name is required';
+    }
+    
+    if (!startDate) {
+      newErrors.startDate = 'Start date is required';
+    }
+    
+    if (!startTime) {
+      newErrors.startTime = 'Start time is required';
+    }
+    
+    if (!endDate) {
+      newErrors.endDate = 'End date is required';
+    }
+    
+    if (!endTime) {
+      newErrors.endTime = 'End time is required';
+    }
+    
+    if (!locationType) {
+      newErrors.location = 'Location is required';
+    }
+    
+    if (!description.trim()) {
+      newErrors.description = 'Description is required';
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   // Form submission handler
   const handleSubmit = async (event) => {
     event.preventDefault();
+    
+    if (!validateForm()) {
+      return;
+    }
 
     // Log all cookies to see if the token is present
     console.log('Cookies:', document.cookie); // Check all cookies
@@ -72,104 +126,335 @@ const CreateEventPage = () => {
     }
   };
 
+  // Helper function to get input style with error state
+  const getInputStyle = (fieldName) => ({
+    padding: '16px',
+    fontSize: fieldName === 'eventName' ? '24px' : '16px',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    border: errors[fieldName] ? '2px solid #ff4444' : 'none',
+    borderRadius: '8px',
+    color: 'white',
+    width: '100%'
+  });
+
   return (
-    <div className="create-event-page">
-      <h2>Create Event</h2>
-      <form onSubmit={handleSubmit}>
-        
-        {/* Event Name */}
-        <label>Event Name:</label>
-        <input
-          type="text"
-          placeholder="Enter event name"
-          required
-          value={eventName}
-          onChange={(e) => setEventName(e.target.value)}
-        />
+    <div style={{
+      padding: '40px',
+      maxWidth: '1200px',
+      margin: '0 auto',
+      backgroundColor: '#1a1a1a',
+      minHeight: '100vh',
+      color: 'white'
+    }}>
+      {/* Header Section */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        marginBottom: '24px'
+      }}>
+        <button style={{
+          padding: '8px 16px',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          border: 'none',
+          borderRadius: '20px',
+          color: 'white'
+        }}>
+          Personal Calendar ▼
+        </button>
+        <button style={{
+          padding: '8px 16px',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          border: 'none',
+          borderRadius: '20px',
+          color: 'white'
+        }}>
+          Public ▼
+        </button>
+      </div>
 
-        {/* Start Date and Time */}
-        <label>Start Date:</label>
-        <input
-          type="date"
-          required
-          value={startDate}
-          onChange={(e) => setStartDate(e.target.value)}
-        />
-
-        <label>Start Time:</label>
-        <input
-          type="time"
-          required
-          value={startTime}
-          onChange={(e) => setStartTime(e.target.value)}
-        />
-
-        {/* End Date and Time */}
-        <label>End Date:</label>
-        <input
-          type="date"
-          required
-          value={endDate}
-          onChange={(e) => setEndDate(e.target.value)}
-        />
-
-        <label>End Time:</label>
-        <input
-          type="time"
-          required
-          value={endTime}
-          onChange={(e) => setEndTime(e.target.value)}
-        />
-
-        {/* Location: Physical or Virtual */}
-        <label>Event Location:</label>
-        <select value={locationType} onChange={handleLocationChange}>
-          <option value="Physical">Physical</option>
-          <option value="Virtual">Virtual</option>
-        </select>
-
-        {/* Event Description */}
-        <label>Description:</label>
-        <textarea
-          placeholder="Enter event description"
-          rows="4"
-          required
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        ></textarea>
-
-        {/* Event Type: Public or Private */}
-        <label>Event Type:</label>
-        <select value={eventType} onChange={(e) => setEventType(e.target.value)}>
-          <option value="Public">Public</option>
-          <option value="Private">Private</option>
-        </select>
-
-        {/* Tickets Required */}
-        <div className="toggle-switch">
-          <label>Require Tickets:</label>
+      <form onSubmit={handleSubmit} style={{
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '24px'
+      }}>
+        {/* Image Upload Section */}
+        <div style={{
+          position: 'relative',
+          width: '300px',
+          height: '300px',
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          marginBottom: '24px'
+        }}>
+          {imagePreview ? (
+            <img 
+              src={imagePreview} 
+              alt="Event preview" 
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+            />
+          ) : (
+            <div style={{
+              width: '100%',
+              height: '100%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: 'column',
+              gap: '12px'
+            }}>
+              <span style={{ fontSize: '40px' }}>📷</span>
+              <span>Upload Event Image</span>
+            </div>
+          )}
           <input
-            type="checkbox"
-            id="requireApproval"
-            checked={requireApproval}
-            onChange={handleToggleChange}
+            type="file"
+            accept="image/*"
+            onChange={handleImageChange}
+            style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              opacity: 0,
+              cursor: 'pointer'
+            }}
           />
-          <label htmlFor="requireApproval" className="switch-label"></label>
-          <span>{requireApproval ? 'Yes' : 'No'}</span>
         </div>
 
-        {/* Event Capacity */}
-        <label>Max Capacity (100 max):</label>
-        <input
-          type="number"
-          value={capacity}
-          onChange={handleCapacityChange}
-          min="1"
-          max="100"
-          required
-        />
+        {/* Event Name Input */}
+        <div>
+          <input
+            type="text"
+            placeholder="Event Name"
+            value={eventName}
+            onChange={(e) => setEventName(e.target.value)}
+            style={getInputStyle('eventName')}
+          />
+          {errors.eventName && (
+            <div style={{ 
+              color: '#ff4444', 
+              fontSize: '14px', 
+              marginTop: '4px' 
+            }}>
+              {errors.eventName}
+            </div>
+          )}
+        </div>
 
-        <button type="submit">Stream Now</button>
+        {/* Date and Time Section */}
+        <div style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.1)',
+          padding: '20px',
+          borderRadius: '12px'
+        }}>
+          <div style={{
+            display: 'flex',
+            gap: '20px',
+            marginBottom: '20px'
+          }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '8px' }}>Start</label>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  style={getInputStyle('startDate')}
+                />
+                {errors.startDate && (
+                  <div style={{ color: '#ff4444', fontSize: '14px' }}>
+                    {errors.startDate}
+                  </div>
+                )}
+                <input
+                  type="time"
+                  value={startTime}
+                  onChange={(e) => setStartTime(e.target.value)}
+                  style={getInputStyle('startTime')}
+                />
+                {errors.startTime && (
+                  <div style={{ color: '#ff4444', fontSize: '14px' }}>
+                    {errors.startTime}
+                  </div>
+                )}
+              </div>
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '8px' }}>End</label>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  style={getInputStyle('endDate')}
+                />
+                {errors.endDate && (
+                  <div style={{ color: '#ff4444', fontSize: '14px' }}>
+                    {errors.endDate}
+                  </div>
+                )}
+                <input
+                  type="time"
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  style={getInputStyle('endTime')}
+                />
+                {errors.endTime && (
+                  <div style={{ color: '#ff4444', fontSize: '14px' }}>
+                    {errors.endTime}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          <div style={{ textAlign: 'right', color: 'rgba(255, 255, 255, 0.6)' }}>
+            GMT+05:30 Calcutta
+          </div>
+        </div>
+
+        {/* Location Input */}
+        <div>
+          <input
+            type="text"
+            placeholder="Add Event Location"
+            value={locationType}
+            onChange={handleLocationChange}
+            style={{
+              padding: '16px',
+              fontSize: '16px',
+              backgroundColor: 'rgba(255, 255, 255, 0.1)',
+              border: 'none',
+              borderRadius: '8px',
+              color: 'white',
+              width: '100%'
+            }}
+          />
+          <span style={{ 
+            fontSize: '14px', 
+            color: 'rgba(255, 255, 255, 0.6)',
+            marginTop: '8px',
+            display: 'block'
+          }}>
+            Offline location or virtual link
+          </span>
+        </div>
+
+        {/* Description Input */}
+        <div>
+          <textarea
+            placeholder="Add Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            style={getInputStyle('description')}
+          />
+          {errors.description && (
+            <div style={{ 
+              color: '#ff4444', 
+              fontSize: '14px', 
+              marginTop: '4px' 
+            }}>
+              {errors.description}
+            </div>
+          )}
+          <span style={{ 
+            fontSize: '14px', 
+            color: 'rgba(255, 255, 255, 0.6)',
+            marginTop: '8px',
+            display: 'block'
+          }}>
+            Describe your event
+          </span>
+        </div>
+
+        {/* Event Options */}
+        <div style={{
+          backgroundColor: 'rgba(255, 255, 255, 0.05)',
+          padding: '24px',
+          borderRadius: '12px'
+        }}>
+          <h3 style={{ marginBottom: '24px' }}>Event Options</h3>
+          
+          {/* Tickets Option */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginBottom: '16px'
+          }}>
+            <div>
+              <h4>Tickets</h4>
+              <span style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                {requireApproval ? 'Required' : 'Free'}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={handleToggleChange}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: 'transparent',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '20px',
+                color: 'white',
+                cursor: 'pointer'
+              }}
+            >
+              Edit
+            </button>
+          </div>
+
+          {/* Capacity Option */}
+          <div style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <div>
+              <h4>Capacity</h4>
+              <span style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+                {capacity === 100 ? 'Unlimited' : `${capacity} people`}
+              </span>
+            </div>
+            <button
+              type="button"
+              onClick={() => setCapacity(prev => prev === 100 ? 50 : 100)}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: 'transparent',
+                border: '1px solid rgba(255, 255, 255, 0.2)',
+                borderRadius: '20px',
+                color: 'white',
+                cursor: 'pointer'
+              }}
+            >
+              Edit
+            </button>
+          </div>
+        </div>
+
+        {/* Create Event Button */}
+        <button
+          type="submit"
+          style={{
+            padding: '16px',
+            backgroundColor: '#4444ff',
+            border: 'none',
+            borderRadius: '8px',
+            color: 'white',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            marginTop: '24px'
+          }}
+        >
+          Create Event
+        </button>
       </form>
     </div>
   );
