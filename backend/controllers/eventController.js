@@ -50,9 +50,14 @@ const createEvent = async (req, res) => {
 // Get all public events
 const getEvents = async (req, res) => {
   try {
-    const events = await Event.find({ eventType: 'Public' }).populate('creator', 'name');
+    const events = await Event.find()
+      .populate('creator', 'name')
+      .select('eventName description location startDate endDate startTime endTime eventType creator streaming participants');
+    
+    console.log('Events being sent:', events);
     res.json(events);
   } catch (error) {
+    console.error('Error fetching events:', error);
     res.status(500).json({ message: 'Error fetching events' });
   }
 };

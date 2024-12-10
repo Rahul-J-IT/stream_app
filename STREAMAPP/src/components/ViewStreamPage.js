@@ -4,6 +4,8 @@ import { io } from 'socket.io-client';
 import ChatBox from './ChatBox';
 import axios from 'axios';
 
+
+
 const ViewStreamPage = () => {
   const videoRef = useRef(null);
   const peerConnectionRef = useRef(null);
@@ -76,7 +78,7 @@ const ViewStreamPage = () => {
     const connectToStream = async () => {
       try {
         // First get the stream details
-        const response = await axios.get(`http://localhost:3001/api/streams`);
+        const response = await axios.get(`http://localhost:5000/api/streams`);
         console.log('Available streams:', response.data.streams);
         
         // Find active stream for this event
@@ -153,7 +155,7 @@ const ViewStreamPage = () => {
         };
 
         // Connect to Socket.IO server
-        const socket = io('http://localhost:3001', {
+        const socket = io('http://localhost:5000', {
           transports: ['websocket'],
           reconnection: true,
           reconnectionAttempts: 5,
@@ -294,6 +296,24 @@ const ViewStreamPage = () => {
       document.removeEventListener('click', handleUserInteraction);
     };
   }, []);
+
+  const endStream = async () => {
+    try {
+      // ... existing stream end code ...
+
+      // Update event streaming status
+      await axios.post(`http://localhost:5000/api/events/${eventId}/end-streaming`, {}, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      console.log('Stream ended and event updated');
+      // ... rest of your stream end logic ...
+    } catch (error) {
+      console.error('Error ending stream:', error);
+    }
+  };
 
   return (
     <div style={{ textAlign: 'center', padding: '20px' }}>

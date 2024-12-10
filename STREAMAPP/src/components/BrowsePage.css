@@ -211,3 +211,18 @@ h2 {
       padding: 8px;
   }
 }
+
+.category-buttons button {
+    padding: 8px 16px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.category-buttons button.active {
+    background-color: rgba(255, 255, 255, 0.2);
+}

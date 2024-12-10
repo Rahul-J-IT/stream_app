@@ -65,29 +65,44 @@ body {
 
 /* Sidebar Styles */
 .sidebar {
-  width: 220px;
-  background-color: #0e0e10;
+  width: 240px;
+  background-color: #1a1a1a;
+  color: white;
   padding: 20px;
+  height: 100%;
 }
 
 .sidebar h2 {
-  margin-bottom: 10px;
-  color: #fff;
+  font-size: 18px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .channel-list {
   list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .channel-list li {
-  padding: 10px 0;
-  display: flex;
-  justify-content: space-between;
-  border-bottom: 1px solid #333;
+  padding: 10px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
 }
 
-.channel-info span {
-  display: block;
+.channel-list li:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.channel-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.channel-info span:first-child {
+  font-weight: 500;
 }
 
 /* Main Player */

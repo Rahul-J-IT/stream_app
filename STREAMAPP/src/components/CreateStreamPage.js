@@ -143,7 +143,7 @@ const CreateStreamPage = () => {
         console.log('Creating stream for event:', eventId);
 
         // Register stream with backend
-        const response = await axios.post('http://localhost:3001/api/streams', {
+        const response = await axios.post('http://localhost:5000/api/streams', {
           title: 'Live Stream',
           streamerId: eventId
         });
@@ -153,7 +153,7 @@ const CreateStreamPage = () => {
         console.log('Stream created with ID:', streamId);
 
         // Connect to Socket.IO server
-        const socket = io('http://localhost:3001', {
+        const socket = io('http://localhost:5000', {
           transports: ['websocket'],
           reconnection: true,
           reconnectionAttempts: 3,
@@ -234,6 +234,15 @@ const CreateStreamPage = () => {
         socket.on('disconnect', () => {
           console.log('Disconnected from server');
         });
+
+        // Update event streaming status
+        await axios.post(`http://localhost:5000/api/events/${eventId}/start-streaming`, {}, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        console.log('Stream started and event updated');
 
       } catch (error) {
         console.error('Error starting stream:', error);
