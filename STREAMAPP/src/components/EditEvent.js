@@ -66,14 +66,55 @@ const EditEvent = () => {
     }
 
     try {
-      await axios.put(`http://localhost:5000/api/events/${id}`, event, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      alert('Event updated successfully!');
-      navigate('/browse');
+      const response = await axios.put(
+        `http://localhost:5000/api/events/${id}`, 
+        event,
+        {
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        alert('Event updated successfully!');
+        navigate('/browse');
+      }
     } catch (error) {
       console.error('Error updating event:', error);
-      alert('Failed to update event.');
+      alert('Failed to update event: ' + (error.response?.data?.message || error.message));
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!token) {
+      alert('Token is missing!');
+      return;
+    }
+
+    if (!window.confirm('Are you sure you want to delete this event?')) {
+      return;
+    }
+
+    try {
+      const response = await axios.delete(
+        `http://localhost:5000/api/events/${id}`,
+        {
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      if (response.status === 200) {
+        alert('Event deleted successfully!');
+        navigate('/browse');
+      }
+    } catch (error) {
+      console.error('Delete error:', error);
+      alert('Failed to delete event: ' + (error.response?.data?.message || error.message));
     }
   };
 

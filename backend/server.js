@@ -16,7 +16,8 @@ connectDB()
 const corsOptions = {
   origin: 'http://localhost:3000', // Allow only this origin
   credentials: true,               // Allow credentials (cookies)
-  methods: ["GET", "POST"],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Add PUT and DELETE
+  allowedHeaders: ['Content-Type', 'Authorization'],     // Allow these headers
 };
 
 app.use(cors(corsOptions)); // Apply CORS with the specified options
