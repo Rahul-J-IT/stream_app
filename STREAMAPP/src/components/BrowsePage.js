@@ -63,18 +63,27 @@ const BrowsePage = () => {
   };
 
   const formatDateTime = (dateString) => {
-    const options = {
+    if (!dateString) return "Invalid date";
+  
+    const date = new Date(dateString);
+    if (isNaN(date)) return "Invalid date"; // Handle invalid date strings
+  
+    // Format as dd/mm/yyyy, hh:mm AM/PM
+    const formattedDate = date.toLocaleDateString('en-GB', {
       year: 'numeric',
       month: '2-digit',
       day: '2-digit',
+    });
+    const formattedTime = date.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: true,
-    };
-
-    const date = new Date(dateString);
-    return date.toLocaleString('en-GB', options);
+    });
+  
+    return `${formattedDate}, ${formattedTime}`;
   };
+  
+  
 
   useEffect(() => {
     const loadEvents = async () => {
@@ -110,7 +119,7 @@ const BrowsePage = () => {
 
   const getFilteredEvents = () => {
     let filtered = events;
-    
+
     // First apply search filter
     if (searchTerm) {
       filtered = filtered.filter(event => 
@@ -118,7 +127,7 @@ const BrowsePage = () => {
         event.description.toLowerCase().includes(searchTerm.toLowerCase())
       );
     }
-    
+
     // Then apply category filter
     if (category === 'public') {
       filtered = filtered.filter(event => event.eventType === 'Public');
@@ -127,7 +136,7 @@ const BrowsePage = () => {
       filtered = filtered.filter(event => event.eventType === 'Private');
       console.log('Private events:', filtered);
     }
-    
+
     return filtered;
   };
 
@@ -186,10 +195,10 @@ const BrowsePage = () => {
           getFilteredEvents().map((event) => (
             <div key={event._id} className="event-card">
               <h3>{event.eventName}</h3>
-              <p>{event.description}</p>
+              <p style={{margin:"1em 0"}}>{event.description}</p>
               <p>Location: {event.location || 'Online'}</p>
-              <p>Start: {new Date(event.startDate).toLocaleString()} {event.startTime || ''}</p>
-              <p>End: {new Date(event.endDate).toLocaleString()} {event.endTime || ''}</p>
+              <p>Start: {formatDateTime(event.startDate)}</p>
+              <p>End: {formatDateTime(event.endDate)}</p>
               <p>Creator: {event.creator?.name || 'Unknown'}</p>
               {event.creator?.name === userName ? (
                 <div className="button-group">
