@@ -16,6 +16,17 @@ const CreateStreamPage = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const videoContainerRef = useRef(null);
 
+  const getCookie = (name) => {
+    const cookieArr = document.cookie.split(';');
+    for (let cookie of cookieArr) {
+      const [cookieName, cookieValue] = cookie.trim().split('=');
+      if (cookieName === name) return decodeURIComponent(cookieValue);
+    }
+    return null;
+  };
+
+  const token = getCookie('token');
+
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 

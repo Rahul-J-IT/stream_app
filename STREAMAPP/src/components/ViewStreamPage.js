@@ -4,9 +4,18 @@ import { io } from 'socket.io-client';
 import ChatBox from './ChatBox';
 import axios from 'axios';
 
-
-
 const ViewStreamPage = () => {
+  const getCookie = (name) => {
+    const cookieArr = document.cookie.split(';');
+    for (let cookie of cookieArr) {
+      const [cookieName, cookieValue] = cookie.trim().split('=');
+      if (cookieName === name) return decodeURIComponent(cookieValue);
+    }
+    return null;
+  };
+
+  const token = getCookie('token');
+
   const videoRef = useRef(null);
   const peerConnectionRef = useRef(null);
   const socketRef = useRef(null);
@@ -299,17 +308,19 @@ const ViewStreamPage = () => {
 
   const endStream = async () => {
     try {
-      // ... existing stream end code ...
+      if (socketRef.current) {
+        socketRef.current.emit('end-stream');
+      }
 
-      // Update event streaming status
-      await axios.post(`http://localhost:5000/api/events/${eventId}/end-streaming`, {}, {
+      await axios.post(`http://localhost:5000/api/events/${eventId}/stop-streaming`, {}, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
 
       console.log('Stream ended and event updated');
-      // ... rest of your stream end logic ...
+      setStreamEnded(true);
+      navigate('/browse');
     } catch (error) {
       console.error('Error ending stream:', error);
     }
