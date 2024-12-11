@@ -12,6 +12,7 @@ import EditEvent from './components/EditEvent';
 import StreamPlayer from './components/StreamPlayer';
 import CreateStreamPage from './components/CreateStreamPage';
 import ViewStreamPage from './components/ViewStreamPage';
+import Profile from './components/Profile';
 import './components/App.css';
 
 function App() {
@@ -27,6 +28,9 @@ function App() {
               {/* Authentication Routes */}
               <Route path="/login" element={<LoginPage />} />
               <Route path="/signup" element={<SignUpPage />} />
+
+              {/* Profile Route */}
+              <Route path="/profile" element={<Profile />} />
 
               {/* Home Page */}
               <Route

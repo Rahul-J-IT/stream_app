@@ -3,6 +3,7 @@ const http = require('http');
 const connectDB = require('./config/db');
 const { app, corsOptions } = require('./app');
 const initializeSocketService = require('./services/socketService');
+const express = require('express');
 
 const PORT = process.env.PORT || 5000;
 
@@ -29,3 +30,5 @@ const startServer = async () => {
 
 // Start the server
 startServer();
+
+app.use('/uploads', express.static('uploads'));

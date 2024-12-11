@@ -1,5 +1,7 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const fs = require('fs').promises;
+const path = require('path');
 
 // Generate JWT
 const generateToken = (id) => {
@@ -68,15 +70,51 @@ const logoutUser = (req, res) => {
 // In userController.js
 
 const getProfile = async (req, res) => {
-  const user = await User.findById(req.user._id).select('-password'); // Exclude password from the response
-  if (!user) {
-    return res.status(404).json({ message: 'User not found' });
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Return user data including the profile image
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      profileImage: user.profileImage, // This should be the filename
+      createdAt: user.createdAt,
+      eventsCreated: user.eventsCreated || [],
+      eventsAttended: user.eventsAttended || []
+    });
+  } catch (error) {
+    console.error('Error getting user profile:', error);
+    res.status(500).json({ message: 'Error getting user profile' });
   }
-  res.json({
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-  });
 };
 
-module.exports = { registerUser, authUser, logoutUser, getProfile }; // Ensure getProfile is exported
+const uploadProfileImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No file uploaded' });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Save the file path to the user's profile
+    user.profileImage = req.file.filename;  // Save just the filename
+    await user.save();
+
+    res.json({ 
+      message: 'Profile image uploaded successfully',
+      imageUrl: req.file.filename
+    });
+  } catch (error) {
+    console.error('Error uploading profile image:', error);
+    res.status(500).json({ message: 'Error uploading profile image' });
+  }
+};
+
+module.exports = { registerUser, authUser, logoutUser, getProfile, uploadProfileImage }; // Ensure getProfile is exported

@@ -1,6 +1,7 @@
 // /server/app.js
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const dotenv = require('dotenv');
 
 // Route imports
@@ -28,7 +29,9 @@ const corsOptions = {
 // Middleware setup
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(express.static('public'));
+
+// Serve static files from uploads directory
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
 app.use('/api/streams', streamRoutes);
