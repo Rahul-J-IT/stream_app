@@ -1,5 +1,6 @@
 // /server/services/streamService.js
-const streams = new Map();
+const streams = require('../models/streamModel');
+
 
 const createStream = (title, streamerId) => {
   // Check if there's already an active stream for this event

@@ -95,10 +95,13 @@ const CreateEventPage = () => {
       return;
     }
 
+    const startDateTime = `${startDate}T${startTime}`;
+    const endDateTime = `${endDate}T${endTime}`;
+  
     // Collect event data to match your schema
     const eventData = {
       eventName,
-      startDate,
+      startDate: new Date(startDate).toISOString().split('T')[0],
       startTime,
       endDate,
       endTime,
