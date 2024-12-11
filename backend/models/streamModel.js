@@ -1,3 +1,3 @@
 const streams = new Map();
 
-module.exports = { streams };
+module.exports =  streams;

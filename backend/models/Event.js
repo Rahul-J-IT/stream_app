@@ -12,7 +12,7 @@ const EventSchema = new mongoose.Schema(
     },
     virtualLink: { type: String },  // Optional for virtual events
     startDate: { type: Date, required: true },
-    endDate: { type: Date },
+    endDate: { type: Date , required: true},
     startTime: { type: String, required: true },
     endTime: { type: String, required: true },
     eventType: { 
@@ -24,6 +24,7 @@ const EventSchema = new mongoose.Schema(
     maxCapacity: { type: Number, default: 50 },
     streaming: { type: Boolean, default: false },   // Tracks if event is being streamed
     participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],  // Track participants
+    thumbnail: { type: String }, 
   },
   { timestamps: true }
 );
