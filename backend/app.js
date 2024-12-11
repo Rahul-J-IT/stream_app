@@ -1,41 +1,45 @@
+// /server/app.js
 const express = require('express');
-const dotenv = require('dotenv');
 const cors = require('cors');
+const dotenv = require('dotenv');
+
+// Route imports
+const streamRoutes = require('./routes/streamRoutes');
 const userRoutes = require('./routes/userRoutes');
 const eventRoutes = require('./routes/eventRoutes');
 
+// Middleware
+const { errorHandler, notFoundHandler } = require('./middlewares/errorMiddleware');
+
+// Configure environment variables
 dotenv.config();
 
+// Create Express app
 const app = express();
 
-// CORS options to allow credentials from specific origin
+// CORS options
 const corsOptions = {
-  origin: 'http://localhost:3000', // Allow only this origin
-  credentials: true,               // Allow credentials (cookies)
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 };
 
-app.use(cors(corsOptions)); // Apply CORS with the specified options
+// Middleware setup
+app.use(cors(corsOptions));
 app.use(express.json());
-app.use(express.static('public')); // For static assets if needed
+app.use(express.static('public'));
 
 // Routes
+app.use('/api/streams', streamRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/events', eventRoutes);
 
-// Handle 404 errors
-app.use((req, res, next) => {
-  const error = new Error(`Not Found - ${req.originalUrl}`);
-  res.status(404);
-  next(error);
-});
+// Error handling
+app.use(notFoundHandler);
+app.use(errorHandler);
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-  const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
-  res.status(statusCode).json({
-    message: err.message,
-    stack: process.env.NODE_ENV === 'production' ? null : err.stack,
-  });
-});
-
-module.exports = app;
+module.exports = {
+  app,
+  corsOptions
+};
