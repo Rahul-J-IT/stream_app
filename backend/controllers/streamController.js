@@ -1,44 +1,42 @@
-const { streams } = require('../models/streamModel');
+// /server/controllers/streamController.js
+const streamService = require('../services/streamService');
 
-exports.createStream = (req, res) => {
+const createStream = (req, res) => {
   try {
     const { title, streamerId } = req.body;
-
-    const existingStream = Array.from(streams.values())
-      .find(s => s.streamerId === streamerId && s.isLive);
-
-    if (existingStream) {
-      return res.json({ success: true, stream: existingStream });
-    }
-
-    const streamId = Math.random().toString(36).substr(2, 9);
-    const newStream = {
-      id: streamId,
-      title,
-      streamerId,
-      isLive: true,
-      viewers: 0,
-      createdAt: new Date().toISOString()
-    };
-
-    streams.set(streamId, newStream);
-    res.status(201).json({ success: true, stream: newStream });
+    const stream = streamService.createStream(title, streamerId);
+    
+    res.status(201).json({ 
+      success: true,
+      stream 
+    });
   } catch (error) {
-    res.status(500).json({ success: false, error: 'Failed to create stream' });
+    console.error('Error creating stream:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to create stream' 
+    });
   }
 };
 
-exports.getStreams = (req, res) => {
+const getStreams = (req, res) => {
   try {
-    const activeStreams = Array.from(streams.values())
-      .map(stream => ({
-        ...stream,
-        isLive: Boolean(stream.isLive),
-        viewerCount: stream.viewers || 0
-      }));
-
-    res.json({ success: true, streams: activeStreams });
+    const streams = streamService.getAllStreams();
+    
+    res.json({ 
+      success: true,
+      streams 
+    });
   } catch (error) {
-    res.status(500).json({ success: false, error: 'Failed to fetch streams' });
+    console.error('Error fetching streams:', error);
+    res.status(500).json({ 
+      success: false,
+      error: 'Failed to fetch streams' 
+    });
   }
+};
+
+module.exports = {
+  createStream,
+  getStreams
 };

@@ -54,7 +54,7 @@ const getEvents = async (req, res) => {
       .populate('creator', 'name')
       .select('eventName description location startDate endDate startTime endTime eventType creator streaming participants');
     
-    console.log('Events being sent:', events);
+    //console.log('Events being sent:', events);
     res.json(events);
   } catch (error) {
     console.error('Error fetching events:', error);
