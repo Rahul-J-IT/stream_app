@@ -62,26 +62,7 @@ const BrowsePage = () => {
     navigate(`/edit-event/${id}`);
   };
 
-  const formatDateTime = (dateString) => {
-    if (!dateString) return "Invalid date";
   
-    const date = new Date(dateString);
-    if (isNaN(date)) return "Invalid date"; // Handle invalid date strings
-  
-    // Format as dd/mm/yyyy, hh:mm AM/PM
-    const formattedDate = date.toLocaleDateString('en-GB', {
-      year: 'numeric',
-      month: '2-digit',
-      day: '2-digit',
-    });
-    const formattedTime = date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
-  
-    return `${formattedDate}, ${formattedTime}`;
-  };
   
   
 
@@ -143,17 +124,24 @@ const BrowsePage = () => {
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
 
-  // Filter events by category and search term
-  const filteredEvents = events
-    .filter((event) =>
-      category ? event.eventType?.toLowerCase() === category.toLowerCase() : true
-    )
-    .filter((event) =>
-      searchTerm
-        ? event.eventName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-          event.description.toLowerCase().includes(searchTerm.toLowerCase())
-        : true
-    );
+  
+
+    function formatEventDate(startDate, startTime) {
+      const date = new Date(startDate);
+      const time = startTime.split(':');
+      date.setHours(parseInt(time[0]), parseInt(time[1]));
+  
+      const day = String(date.getDate()).padStart(2, '0');
+      const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+      const year = date.getFullYear();
+  
+      let hours = date.getHours();
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      const ampm = hours >= 12 ? 'PM' : 'AM';
+      hours = hours % 12 || 12; // Convert to 12-hour format
+  
+      return `${day}/${month}/${year},${String(hours).padStart(2, '0')}:${minutes} ${ampm}`;
+  }
 
   return (
     <div>
@@ -194,11 +182,18 @@ const BrowsePage = () => {
         ) : (
           getFilteredEvents().map((event) => (
             <div key={event._id} className="event-card">
-              <h3>{event.eventName}</h3>
-              <p style={{margin:"1em 0"}}>{event.description}</p>
+              {/* Add thumbnail section */}
+              <div className="thumbnail-container">
+                <img 
+                  src={thumbnails[event._id]} 
+                  alt={`${event.eventName} thumbnail`} 
+                  className="thumbnail" 
+                />
+              </div>
+              <h3>{event.eventName}</h3>   <p style={{margin:"1em 0"}}>{event.description}</p>
               <p>Location: {event.location || 'Online'}</p>
-              <p>Start: {formatDateTime(event.startDate)}</p>
-              <p>End: {formatDateTime(event.endDate)}</p>
+              <p>Start: {formatEventDate(event.startDate, event.startTime)}</p>
+              <p>End: {formatEventDate(event.endDate,event.endTime)}</p>
               <p>Creator: {event.creator?.name || 'Unknown'}</p>
               {event.creator?.name === userName ? (
                 <div className="button-group">

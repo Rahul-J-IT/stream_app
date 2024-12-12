@@ -15,6 +15,18 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  profileImage: {
+    type: String,
+    default: null
+  },
+  eventsCreated: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Event'
+  }],
+  eventsAttended: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Event'
+  }]
 }, { timestamps: true });
 
 // Hash password before saving

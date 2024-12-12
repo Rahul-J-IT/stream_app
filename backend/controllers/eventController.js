@@ -14,6 +14,7 @@ const createEvent = async (req, res) => {
     ticketsRequired,
     maxCapacity,
     virtualLink,
+    thumbnail, // Add thumbnail
   } = req.body;
 
   try {
@@ -34,9 +35,10 @@ const createEvent = async (req, res) => {
       ticketsRequired,
       maxCapacity,
       virtualLink,
-      creator: req.user.id,  // Assuming you have user authentication
-      streaming: false,       // Default to no streaming at creation
-      participants: [],       // Empty participants list at creation
+      thumbnail, // Include thumbnail
+      creator: req.user.id, // Assuming you have user authentication
+      streaming: false, // Default to no streaming at creation
+      participants: [], // Empty participants list at creation
     });
 
     await newEvent.save();
@@ -52,9 +54,8 @@ const getEvents = async (req, res) => {
   try {
     const events = await Event.find()
       .populate('creator', 'name')
-      .select('eventName description location startDate endDate startTime endTime eventType creator streaming participants');
+      .select('eventName description location startDate endDate startTime endTime eventType creator streaming participants thumbnail');
     
-    console.log('Events being sent:', events);
     res.json(events);
   } catch (error) {
     console.error('Error fetching events:', error);
@@ -64,12 +65,17 @@ const getEvents = async (req, res) => {
 
 // Get a single event by ID
 const getEventById = async (req, res) => {
-  const event = await Event.findById(req.params.id).populate('creator', 'name');
+  try {
+    const event = await Event.findById(req.params.id).populate('creator', 'name');
 
-  if (event) {
-    res.json(event);
-  } else {
-    res.status(404).json({ message: 'Event not found' });
+    if (event) {
+      res.json(event);
+    } else {
+      res.status(404).json({ message: 'Event not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching event by ID:', error);
+    res.status(500).json({ message: 'Error fetching event' });
   }
 };
 
@@ -98,6 +104,7 @@ const updateEvent = async (req, res) => {
     event.ticketsRequired = req.body.ticketsRequired ?? event.ticketsRequired;
     event.maxCapacity = req.body.maxCapacity ?? event.maxCapacity;
     event.virtualLink = req.body.virtualLink ?? event.virtualLink;
+    event.thumbnail = req.body.thumbnail ?? event.thumbnail; // Update thumbnail
 
     const updatedEvent = await event.save();
     res.json(updatedEvent);
