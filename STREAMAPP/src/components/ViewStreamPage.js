@@ -30,6 +30,8 @@ const ViewStreamPage = () => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const videoContainerRef = useRef(null);
   const [audioEnabled, setAudioEnabled] = useState(false);
+  const [isChatCollapsed, setIsChatCollapsed] = useState(true);
+
 
   // Handle volume change
   const handleVolumeChange = (e) => {
@@ -334,13 +336,23 @@ const ViewStreamPage = () => {
         justifyContent: 'center',
         alignItems: 'flex-start',
         gap: '20px',
-        maxWidth: '1400px', 
+        maxWidth: '1600px',
         margin: '0 auto'
       }}>
-        <div style={{ 
-          flex: '1',
-          marginBottom: '20px' 
-        }}>
+         <div style={{ flex: '1', marginBottom: '20px',
+          transition:"width 0.3s ease",
+          width: isChatCollapsed? '100%':"calc(100%-320px)"
+         }}>
+          <div 
+            ref={videoContainerRef}
+            style={{ 
+              position: 'relative',
+              width: '100%',
+              backgroundColor: '#000',
+              borderRadius: '8px',
+              overflow: 'hidden'
+            }}
+          >
           {error === 'Stream not yet started' ? (
             <div style={{
               width: '100%',
@@ -544,12 +556,19 @@ const ViewStreamPage = () => {
             </div>
           )}
         </div>
+        </div>
         {socketRef.current && (
-          <div style={{ width: '300px' }}>
+           <div style={{
+            position: 'relative', // Changed to relative
+            height: '80vh',
+            marginLeft: '10px', // Add space between video and chat/icon
+            transition: 'all 0.3s ease',
+          }}>
             <ChatBox 
               socket={socketRef.current} 
               eventId={eventId}
               isBroadcaster={false}
+              onCollapseChange={setIsChatCollapsed}
             />
           </div>
         )}
@@ -558,4 +577,4 @@ const ViewStreamPage = () => {
   );
 };
 
-export default ViewStreamPage; 
+export default ViewStreamPage;

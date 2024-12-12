@@ -14,6 +14,7 @@ const CreateStreamPage = () => {
   const { eventId } = useParams();
   const [socketConnected, setSocketConnected] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isChatCollapsed, setIsChatCollapsed] = useState(true);
   const videoContainerRef = useRef(null);
 
   const getCookie = (name) => {
@@ -284,7 +285,7 @@ const CreateStreamPage = () => {
     };
   }, [eventId]);
 
-  const handleEndStream = () => {
+  const handleEndStream = async() => {
     if (mediaStream) {
       // Stop all tracks in the media stream
       mediaStream.getTracks().forEach(track => {
@@ -295,6 +296,17 @@ const CreateStreamPage = () => {
       // Clear the video source
       if (videoRef.current) {
         videoRef.current.srcObject = null;
+      }
+      try {
+        // Update event streaming status in database
+        await axios.post(`http://localhost:5000/api/events/${eventId}/stop-streaming`, {}, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        console.log('Stream ended and event updated');
+      } catch (error) {
+        console.error('Error stopping stream:', error);
       }
       
       // Notify server that stream is ending
@@ -326,7 +338,10 @@ const CreateStreamPage = () => {
         maxWidth: '1400px',
         margin: '0 auto'
       }}>
-        <div style={{ flex: '1', marginBottom: '20px' }}>
+        <div style={{ flex: '1', marginBottom: '20px',
+          transition:"width 0.3s ease",
+          width: isChatCollapsed? '100%':"calc(100%-320px)"
+         }}>
           <div 
             ref={videoContainerRef}
             style={{ 
@@ -400,31 +415,31 @@ const CreateStreamPage = () => {
                   onMouseLeave={e => e.target.style.opacity = '0.9'}
                   title={isScreenSharing ? 'Stop Screen Share' : 'Share Screen'}
                 >
-                  {isScreenSharing ? '🖥️' : '📱'}
+                  {isScreenSharing ? '🖥' : '📱'}
                 </button>
 
                 {/* End Stream Button */}
                 <button 
-                  onClick={handleEndStream}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: '#ff4444',
-                    cursor: 'pointer',
-                    padding: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '5px',
-                    fontSize: '20px',
-                    opacity: '0.9',
-                    transition: 'opacity 0.2s'
-                  }}
-                  onMouseEnter={e => e.target.style.opacity = '1'}
-                  onMouseLeave={e => e.target.style.opacity = '0.9'}
-                  title="End Stream"
-                >
-                  ⏹️
-                </button>
+  onClick={handleEndStream}
+  style={{
+    background: 'none',
+    border: 'none',
+    color: '#ff4444',
+    cursor: 'pointer',
+    padding: '8px',
+    display: 'flex',
+    alignItems: 'center',
+    gap: '5px',
+    fontSize: '20px',
+    opacity: '0.9',
+    transition: 'opacity 0.2s'
+  }}
+  onMouseEnter={e => e.target.style.opacity = '1'}
+  onMouseLeave={e => e.target.style.opacity = '0.9'}
+  title="End Stream"
+>
+⏹
+</button>   
 
                 {/* Fullscreen Button */}
                 <button
@@ -450,11 +465,14 @@ const CreateStreamPage = () => {
           </div>
         </div>
         {socketConnected && (
-          <div style={{ width: '300px' }}>
+          <div style={{ width: isChatCollapsed ? '50px' : '320px',
+            transition:"width 0.3s ease"
+           }}>
             <ChatBox 
               socket={socketRef.current} 
               eventId={eventId}
               isBroadcaster={true}
+              onCollapseChange={setIsChatCollapsed}
             />
           </div>
         )}
@@ -463,4 +481,4 @@ const CreateStreamPage = () => {
   );
 };
 
-export default CreateStreamPage; 
+export default CreateStreamPage;
