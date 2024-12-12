@@ -250,7 +250,7 @@ h2 {
 }
 
 .profile-card h2 {
-  color: #333;
+  color: #fff;
   margin-bottom: 30px;
   text-align: center;
 }
@@ -271,11 +271,11 @@ h2 {
 
 .profile-field label {
   font-weight: bold;
-  color: #666;
+  color: #fff;
 }
 
 .profile-field span {
-  color: #333;
+  color: #fff;
 }
 
 /* Profile Page Styles */
@@ -346,13 +346,13 @@ h2 {
 }
 
 .profile-header h1 {
-  color: #333;
+  color: #fff;
   font-size: 2em;
   margin-top: 15px;
 }
 
 .profile-content {
-  background: white;
+  background: #1E1E1E;
   border-radius: 15px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -360,8 +360,8 @@ h2 {
 
 .profile-section {
   padding: 30px;
-  border-bottom: 1px solid #eee;
-  background: linear-gradient(to right, #fff, #f8f9fa);
+  border-bottom: 1px solid #333;
+  background: #1E1E1E;
 }
 
 .profile-section:last-child {
@@ -369,7 +369,7 @@ h2 {
 }
 
 .profile-section h2 {
-  color: #ff4444;
+  color: #fff;
   margin-bottom: 25px;
   font-size: 1.5em;
 }
@@ -384,10 +384,10 @@ h2 {
   display: flex;
   align-items: center;
   padding: 20px;
-  background: white;
+  background: #1E1E1E;
   border-radius: 10px;
   transition: all 0.3s ease;
-  border: 1px solid #eee;
+  border: 1px solid #333;
 }
 
 .profile-info-item:hover {
@@ -408,14 +408,14 @@ h2 {
 
 .info-content label {
   display: block;
-  color: #666;
+  color: #ccc;
   font-size: 0.9em;
   margin-bottom: 5px;
   font-weight: 500;
 }
 
 .info-content span {
-  color: #333;
+  color: #fff;
   font-weight: 600;
   font-size: 1.1em;
 }
@@ -427,13 +427,13 @@ h2 {
 }
 
 .stat-card {
-  background: white;
+  background: #1E1E1E;
   padding: 25px;
   border-radius: 10px;
   display: flex;
   align-items: center;
   transition: all 0.3s ease;
-  border: 1px solid #eee;
+  border: 1px solid #333;
 }
 
 .stat-card:hover {
@@ -456,12 +456,12 @@ h2 {
   display: block;
   font-size: 2em;
   font-weight: bold;
-  color: #ff4444;
+  color: #fff;
   margin-bottom: 5px;
 }
 
 .stat-content label {
-  color: #666;
+  color: #ccc;
   font-size: 0.9em;
   font-weight: 500;
 }
@@ -481,5 +481,13 @@ h2 {
   border-radius: 10px;
   margin-top: 20px;
   box-shadow: 0 4px 6px rgba(255, 68, 68, 0.2);
+}
+
+.profile-avatar div {
+  background-color: #2E2E2E;
+}
+
+.profile-header h1 {
+  color: #fff;
 }
 

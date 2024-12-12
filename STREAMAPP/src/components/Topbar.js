@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
+import axios from 'axios';
 import './App.css';
 
 function Topbar() {
@@ -23,15 +24,17 @@ function Topbar() {
     if (!token) return;
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_API_URL}/api/users/profile`, {
+      const response = await axios.get('http://localhost:5000/api/users/profile', {
         headers: {
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`
         }
       });
       
-      if (response.ok) {
-        const data = await response.json();
-        setProfileImage(data.profileImage);
+      if (response.data.profileImage) {
+        const imageUrl = response.data.profileImage.startsWith('http') 
+          ? response.data.profileImage 
+          : `http://localhost:5000/uploads/${response.data.profileImage}`;
+        setProfileImage(imageUrl);
       }
     } catch (error) {
       console.error('Error fetching profile:', error);
@@ -78,26 +81,26 @@ function Topbar() {
                   alignItems: 'center',
                   padding: '8px',
                   borderRadius: '50%',
-                  backgroundColor: '#f0f0f0',
+                  backgroundColor: '#1E1E1E',
                   transition: 'all 0.2s',
                   fontSize: '1.2em'
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.backgroundColor = '#e0e0e0';
+                  e.currentTarget.style.backgroundColor = '#2E2E2E';
                   e.currentTarget.style.transform = 'scale(1.1)';
                 }}
                 onMouseLeave={(e) => {
-                  e.currentTarget.style.backgroundColor = '#f0f0f0';
+                  e.currentTarget.style.backgroundColor = '#1E1E1E';
                   e.currentTarget.style.transform = 'scale(1)';
                 }}
               >
                 {profileImage ? (
                   <img 
-                    src={`${process.env.REACT_APP_API_URL}/uploads/${profileImage}`}
+                    src={profileImage}
                     alt="Profile"
                     style={{
-                      width: '24px',
-                      height: '24px',
+                      width: '32px',
+                      height: '32px',
                       borderRadius: '50%',
                       objectFit: 'cover'
                     }}
@@ -110,7 +113,7 @@ function Topbar() {
                     }}
                   />
                 ) : (
-                  <FontAwesomeIcon icon={faUser} />
+                  <FontAwesomeIcon icon={faUser} style={{ color: '#fff' }} />
                 )}
               </Link>
             </span>

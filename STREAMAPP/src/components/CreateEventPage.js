@@ -18,6 +18,7 @@ const CreateEventPage = () => {
   const [eventImage, setEventImage] = useState(null);
   const [imagePreview, setImagePreview] = useState(null);
   const [errors, setErrors] = useState({});
+  const [uploading, setUploading] = useState(false);
 
   // Handlers for form input
   const handleLocationChange = (event) => setLocationType(event.target.value);
@@ -29,14 +30,37 @@ const CreateEventPage = () => {
 
   const handleToggleChange = () => setRequireApproval(!requireApproval);
 
-  // Add image handler
-  const handleImageChange = (e) => {
+  // Update handleImageChange to use FormData and upload immediately
+  const handleImageChange = async (e) => {
     const file = e.target.files[0];
     if (file) {
-      setEventImage(file);
-      // Create preview URL
-      const previewUrl = URL.createObjectURL(file);
-      setImagePreview(previewUrl);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+
+      try {
+        setUploading(true);
+        const formData = new FormData();
+        formData.append('eventImage', file);
+
+        const token = getCookie('token');
+        const uploadResponse = await axios.post('http://localhost:5000/api/events/upload-image', formData, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+
+        console.log('Upload response:', uploadResponse.data);
+        setEventImage(uploadResponse.data.imageUrl);
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        alert('Failed to upload image. Please try again.');
+      } finally {
+        setUploading(false);
+      }
     }
   };
 
@@ -76,7 +100,7 @@ const CreateEventPage = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  // Form submission handler
+  // Update handleSubmit to include the image URL
   const handleSubmit = async (event) => {
     event.preventDefault();
     
@@ -84,21 +108,14 @@ const CreateEventPage = () => {
       return;
     }
 
-    // Log all cookies to see if the token is present
-    console.log('Cookies:', document.cookie); // Check all cookies
-
-    const token = Cookies.get('token'); // Retrieve token from cookies
-    console.log('Token:', token); // Debugging line
+    const token = getCookie('token');
+    console.log('Token:', token);
 
     if (!token) {
       console.error('No token found. User might not be authenticated.');
       return;
     }
 
-    const startDateTime = `${startDate}T${startTime}`;
-    const endDateTime = `${endDate}T${endTime}`;
-  
-    // Collect event data to match your schema
     const eventData = {
       eventName,
       startDate: new Date(startDate).toISOString().split('T')[0],
@@ -110,20 +127,18 @@ const CreateEventPage = () => {
       eventType,
       ticketsRequired: requireApproval,
       maxCapacity: capacity,
+      eventImage: eventImage // Add the image URL to event data
     };
 
-    // Post event data to backend
     try {
       const response = await axios.post('http://localhost:5000/api/events', eventData, {
         headers: {
-          Authorization: `Bearer ${token}`, // Include token in Authorization header
+          Authorization: `Bearer ${token}`,
         },
       });
 
       console.log('Event created successfully:', response.data);
-
-      // Redirect after successful creation
-      window.location.href = '/browse'; // Adjust as needed for React Router
+      window.location.href = '/browse';
     } catch (error) {
       console.error('Error creating event:', error.response ? error.response.data : error.message);
     }
@@ -229,6 +244,16 @@ const CreateEventPage = () => {
             }}
           />
         </div>
+        {uploading && (
+          <div style={{ 
+            color: '#ff4444', 
+            marginTop: '10px',
+            fontSize: '0.9em',
+            animation: 'pulse 1.5s infinite'
+          }}>
+            Uploading...
+          </div>
+        )}
 
         {/* Event Name Input */}
         <div>

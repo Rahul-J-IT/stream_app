@@ -75,9 +75,11 @@ const BrowsePage = () => {
         console.log('Private events:', fetchedEvents.filter(event => event.eventType === 'Private'));
         setEvents(fetchedEvents);
 
-        // Assuming events contain a field `thumbnail` or `eventThumbnail` for image URL
+        // Update thumbnail handling to use the eventImage field
         const thumbnailData = fetchedEvents.reduce((acc, event) => {
-          acc[event._id] = event.thumbnail || 'https://via.placeholder.com/150';
+          acc[event._id] = event.eventImage 
+            ? `http://localhost:5000/uploads/${event.eventImage}`
+            : 'https://via.placeholder.com/150';
           return acc;
         }, {});
         setThumbnails(thumbnailData);
@@ -188,6 +190,10 @@ const BrowsePage = () => {
                   src={thumbnails[event._id]} 
                   alt={`${event.eventName} thumbnail`} 
                   className="thumbnail" 
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://via.placeholder.com/150';
+                  }}
                 />
               </div>
               <h3>{event.eventName}</h3>   <p style={{margin:"1em 0"}}>{event.description}</p>

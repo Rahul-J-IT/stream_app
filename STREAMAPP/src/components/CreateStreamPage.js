@@ -27,7 +27,6 @@ const CreateStreamPage = () => {
   };
 
   const token = getCookie('token');
-
   const startCamera = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ 
